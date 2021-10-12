@@ -1,8 +1,8 @@
 {
     "name": "CreativeMode",
-    "version_number": "1.0.1",
+    "version_number": "1.2.0",
     "website_url": "https://github.com/hawkfalcon/Timberborn-Mods",
-    "description": "This mod lets you place anything, anytime",
+    "description": "This mod lets you place or remove anything, anytime",
     "dependencies": [
         "BepInEx-BepInExPack_Timberborn-5.4.15"
     ]

@@ -15,7 +15,7 @@
     <PackageReference Include="BepInEx.PluginInfoProps" Version="1.1.0" />
     <PackageReference Include="UnityEngine.Modules" Version="2021.1.22" IncludeAssets="compile" />
     <Reference Include="Timberborn.BonusSystem">
-      <HintPath>libs/Timberborn.BonusSystem.dll</HintPath>
+      <HintPath>../lib/Timberborn.BonusSystem.dll</HintPath>
     </Reference>
   </ItemGroup>
   
