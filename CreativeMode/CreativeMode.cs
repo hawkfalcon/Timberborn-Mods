@@ -18,6 +18,7 @@ using UnityEngine;
 using CreativeMode;
 using MonoMod.Utils;
 using Timberborn.ToolSystem;
+using Timberborn.PrefabOptimization;
 
 namespace CreativeModePlugin {
 
@@ -149,6 +150,13 @@ namespace CreativeModePlugin {
             if (____toolGroup.DisplayNameLocKey.Equals("ToolGroups.MapEditor")) {
                 __result = false;
             }
+        }
+
+        [HarmonyPrefix]
+        [HarmonyPatch(typeof(AutoAtlaser), "TooManyAtlases")]
+        static bool HideWarning(ref bool __result) {
+            __result = false;
+            return false;
         }
     }
 }
