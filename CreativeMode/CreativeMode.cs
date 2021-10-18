@@ -21,7 +21,7 @@ using Timberborn.ToolSystem;
 
 namespace CreativeModePlugin {
 
-    [BepInPlugin("com.hawkfalcon.plugin.creativemode", "Creative Mode", "1.2.0.0")]
+    [BepInPlugin("com.hawkfalcon.plugin.creativemode", "Creative Mode", "1.3.0.0")]
     [HarmonyPatch]
     public class CreativeModePlugin : BaseUnityPlugin {
         private static ConfigEntry<bool> disableScienceCost;

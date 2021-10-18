@@ -6,5 +6,6 @@ This mod lets you place or remove anything, anytime
     - Delete anything (resources, buildings, etc) instantly
     - Terrain raise/lower tool from map editor
     - Resource add/remove tool from map editor
+    - Place Water Source, Barrier, Ramp, and Ruins
 
 More to come
