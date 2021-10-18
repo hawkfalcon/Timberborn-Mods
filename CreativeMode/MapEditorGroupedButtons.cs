@@ -1,14 +1,16 @@
 ﻿using Timberborn.MapEditor;
 using Timberborn.BottomBarSystem;
 using Timberborn.ToolSystem;
+using Timberborn.BlockSystem;
+using Timberborn.BlockObjectTools;
 using System.Collections.Generic;
 
-namespace CreativeMode {
+namespace CreativeMode { 
 
     /**
      * Modified from MapEditorButtons
      */
-    public class MapEditorGroupedButtons : IBottomBarElementsProvider {
+    public class MapEditorGroupedButtons : IBottomBarElementProvider {
         private static readonly string AbsoluteTerrainHeightBrushImageKey = "AbsoluteTerrainHeightBrush";
 
         private static readonly string RelativeTerrainHeightBrushImageKey = "RelativeTerrainHeightBrushIcon";
@@ -17,7 +19,21 @@ namespace CreativeMode {
 
         private static readonly string NaturalResourcesRemovalImageKey = "RemoveNaturalResourcesIcon";
 
+        private static readonly string MapEditorToolGroupKey = "MapEditor";
+
+        private readonly MapEditorToolGroup _mapEditorToolGroup;
+
         private readonly ToolButtonFactory _toolButtonFactory;
+
+        private readonly ToolGroupButtonFactory _toolGroupButtonFactory;
+
+        private readonly ToolGroupSpecificationService _toolGroupSpecificationService;
+
+        private readonly BlockObjectToolGroupSpecificationService _blockObjectToolGroupSpecificationService;
+
+        private readonly BlockObjectToolGroupFactory _blockObjectToolGroupFactory;
+
+        private readonly BlockObjectToolButtonFactory _blockObjectToolButtonFactory;
 
         private readonly AbsoluteTerrainHeightBrushTool _absoluteTerrainHeightBrushTool;
 
@@ -27,23 +43,51 @@ namespace CreativeMode {
 
         private readonly NaturalResourceRemovalBrushTool _naturalResourceRemovalBrushTool;
 
-        public MapEditorGroupedButtons(ToolButtonFactory toolButtonFactory, AbsoluteTerrainHeightBrushTool absoluteTerrainHeightBrushTool, RelativeTerrainHeightBrushTool relativeTerrainHeightBrushTool, NaturalResourceSpawningBrushTool naturalResourceSpawningBrushTool, NaturalResourceRemovalBrushTool naturalResourceRemovalBrushTool) {
+        public MapEditorGroupedButtons(
+            MapEditorToolGroup mapEditorToolGroup,
+            ToolButtonFactory toolButtonFactory,
+            ToolGroupButtonFactory toolGroupButtonFactory,
+            ToolGroupSpecificationService toolGroupSpecificationService,
+            BlockObjectToolGroupSpecificationService blockObjectToolGroupSpecificationService,
+            BlockObjectToolGroupFactory blockObjectToolGroupFactory,
+            BlockObjectToolButtonFactory blockObjectToolButtonFactory,
+            AbsoluteTerrainHeightBrushTool absoluteTerrainHeightBrushTool,
+            RelativeTerrainHeightBrushTool relativeTerrainHeightBrushTool,
+            NaturalResourceSpawningBrushTool naturalResourceSpawningBrushTool,
+            NaturalResourceRemovalBrushTool naturalResourceRemovalBrushTool) {
+            _mapEditorToolGroup = mapEditorToolGroup;
             _toolButtonFactory = toolButtonFactory;
+            _toolGroupButtonFactory = toolGroupButtonFactory;
+            _toolGroupSpecificationService = toolGroupSpecificationService;
+            _blockObjectToolGroupSpecificationService = blockObjectToolGroupSpecificationService;
+            _blockObjectToolGroupFactory = blockObjectToolGroupFactory;
+            _blockObjectToolButtonFactory = blockObjectToolButtonFactory;
             _absoluteTerrainHeightBrushTool = absoluteTerrainHeightBrushTool;
             _relativeTerrainHeightBrushTool = relativeTerrainHeightBrushTool;
             _naturalResourceSpawningBrushTool = naturalResourceSpawningBrushTool;
             _naturalResourceRemovalBrushTool = naturalResourceRemovalBrushTool;
         }
 
-        public IEnumerable<BottomBarElement> GetElements() {
-            ToolButton absoluteHeightToolButton = _toolButtonFactory.CreateGrouplessBlue(_absoluteTerrainHeightBrushTool, AbsoluteTerrainHeightBrushImageKey);
-            yield return BottomBarElement.CreateSingleLevel(absoluteHeightToolButton.Root);
-            ToolButton relativeHeightToolButton = _toolButtonFactory.CreateGrouplessBlue(_relativeTerrainHeightBrushTool, RelativeTerrainHeightBrushImageKey);
-            yield return BottomBarElement.CreateSingleLevel(relativeHeightToolButton.Root);
-            ToolButton resourceSpawningToolButton = _toolButtonFactory.CreateGrouplessBlue(_naturalResourceSpawningBrushTool, NaturalResourcesSpawningImageKey);
-            yield return BottomBarElement.CreateSingleLevel(resourceSpawningToolButton.Root);
-            ToolButton resourceRemovalToolButton = _toolButtonFactory.CreateGrouplessBlue(_naturalResourceRemovalBrushTool, NaturalResourcesRemovalImageKey);
-            yield return BottomBarElement.CreateSingleLevel(resourceRemovalToolButton.Root);
+        public BottomBarElement GetElement() {
+            ToolGroupButton group = _toolGroupButtonFactory.CreateBlue(_mapEditorToolGroup);
+            AddTool(_absoluteTerrainHeightBrushTool, AbsoluteTerrainHeightBrushImageKey, group);
+            AddTool(_relativeTerrainHeightBrushTool, RelativeTerrainHeightBrushImageKey, group);
+            AddTool(_naturalResourceSpawningBrushTool, NaturalResourcesSpawningImageKey, group);
+            AddTool(_naturalResourceRemovalBrushTool, NaturalResourcesRemovalImageKey, group);
+
+            ToolGroupSpecification mapEditorBlockObjectsGroup = _toolGroupSpecificationService.GetToolGroupSpecification(MapEditorToolGroupKey);
+            IEnumerable<PlaceableBlockObject> blockObjectsGroup = _blockObjectToolGroupSpecificationService.GetBlockObjectsFromGroup(mapEditorBlockObjectsGroup);
+            foreach (PlaceableBlockObject placeableBlockObject in blockObjectsGroup) {
+                ToolButton placeableBlockObjectTool = _blockObjectToolButtonFactory.Create(placeableBlockObject, _mapEditorToolGroup, group.ToolButtonsElement);
+                group.AddTool(placeableBlockObjectTool);
+            }
+
+            return BottomBarElement.CreateMultiLevel(group.Root, group.ToolButtonsElement);
+        }
+
+        private void AddTool(Tool tool, string imageName, ToolGroupButton group) {
+            ToolButton button = _toolButtonFactory.Create(tool, imageName, group.ToolButtonsElement);
+            group.AddTool(button);
         }
     }
 }

@@ -44,12 +44,15 @@ namespace CreativeMode {
 
             public BottomBarModule Get() {
                 BottomBarModule.Builder builder = new BottomBarModule.Builder();
-                builder.AddMiddleSectionElements(_mapEditorGroupedButtons);
+                builder.AddLeftSectionElement(_mapEditorGroupedButtons, 9);
                 return builder.Build();
             }
         }
 
         public void Configure(IContainerDefinition containerDefinition) {
+            containerDefinition.Bind<MapEditorToolGroup>().AsSingleton();
+            containerDefinition.Bind<MapEditorButtons>().AsSingleton();
+
             containerDefinition.Bind<NaturalResourceLayerService>().AsSingleton();
             containerDefinition.Bind<BrushProbabilityMap>().AsSingleton();
             containerDefinition.Bind<BrushShapeIterator>().AsSingleton();
@@ -63,7 +66,6 @@ namespace CreativeMode {
             containerDefinition.Bind<RelativeTerrainHeightBrushTool>().AsSingleton();
             containerDefinition.Bind<NaturalResourceSpawningBrushTool>().AsSingleton();
             containerDefinition.Bind<NaturalResourceRemovalBrushTool>().AsSingleton();
-            containerDefinition.Bind<MapEditorButtons>().AsSingleton();
             containerDefinition.Bind<NaturalResourceLayerToggle>().AsSingleton();
             containerDefinition.MultiBind<ToolPanelModule>().ToProvider<ToolPanelModuleProvider>().AsSingleton();
             containerDefinition.MultiBind<BottomBarModule>().ToProvider<BottomBarModuleProvider>().AsSingleton();

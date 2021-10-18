@@ -15,51 +15,7 @@
     <PackageReference Include="BepInEx.Core" Version="5.4.16" />
     <PackageReference Include="BepInEx.PluginInfoProps" Version="1.1.0" />
     <PackageReference Include="UnityEngine.Modules" Version="2021.1.22" IncludeAssets="compile" />
-    <Reference Include="Bindito.Core">
-      <HintPath>../lib/Bindito.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="Timberborn.BlockSystem">
-      <HintPath>../lib/Timberborn.BlockSystem.dll</HintPath>
-    </Reference>
-    <Reference Include="Timberborn.Buildings">
-      <HintPath>../lib/Timberborn.Buildings.dll</HintPath>
-    </Reference>
-    <Reference Include="Timberborn.BuildingTools">
-      <HintPath>../lib/Timberborn.BuildingTools.dll</HintPath>
-    </Reference>
-    <Reference Include="Timberborn.ScienceSystem">
-      <HintPath>../lib/Timberborn.ScienceSystem.dll</HintPath>
-    </Reference>
-    <Reference Include="Timberborn.FactionSystemGame">
-      <HintPath>../lib/Timberborn.FactionSystemGame.dll</HintPath>
-    </Reference>
-    <Reference Include="Timberborn.FactionSystem">
-      <HintPath>../lib/Timberborn.FactionSystem.dll</HintPath>
-    </Reference>
-    <Reference Include="Timberborn.AssetSystem">
-      <HintPath>../lib/Timberborn.AssetSystem.dll</HintPath>
-    </Reference>
-    <Reference Include="Timberborn.BottomBarSystem">
-      <HintPath>../lib/Timberborn.BottomBarSystem.dll</HintPath>
-    </Reference>
-    <Reference Include="Timberborn.ToolPanelSystem">
-      <HintPath>../lib/Timberborn.ToolPanelSystem.dll</HintPath>
-    </Reference>
-    <Reference Include="Timberborn.InputSystem">
-      <HintPath>../lib/Timberborn.InputSystem.dll</HintPath>
-    </Reference>
-    <Reference Include="Timberborn.MapEditor">
-      <HintPath>../lib/Timberborn.MapEditor.dll</HintPath>
-    </Reference>
-    <Reference Include="Timberborn.MasterScene">
-      <HintPath>../lib/Timberborn.MasterScene.dll</HintPath>
-    </Reference>
-    <Reference Include="Timberborn.ToolSystem">
-      <HintPath>../lib/Timberborn.ToolSystem.dll</HintPath>
-    </Reference>
-    <Reference Include="Timberborn.BlockObjectTools">
-      <HintPath>../lib/Timberborn.BlockObjectTools.dll</HintPath>
-    </Reference>
+    <Reference Include="../lib/*.dll" />
     <Reference Include="System.Collections.Immutable, Version=5.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
     <PackageReference Include="System.Collections.Immutable" Version="5.0.0" />
   </ItemGroup>

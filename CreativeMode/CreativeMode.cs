@@ -11,10 +11,13 @@ using Timberborn.FactionSystem;
 using Timberborn.AssetSystem;
 using Timberborn.MasterScene;
 using Timberborn.BlockObjectTools;
+using Timberborn.Localization;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using CreativeMode;
+using MonoMod.Utils;
+using Timberborn.ToolSystem;
 
 namespace CreativeModePlugin {
 
@@ -120,6 +123,31 @@ namespace CreativeModePlugin {
             if (enableMapEditorTools.Value) {
                 containerDefinition.Bind<MapEditorGroupedButtons>().AsSingleton();
                 containerDefinition.Install((IConfigurator)(object)new MapEditorButtonsConfigurator());
+            }
+        }
+
+        /**
+         * Add my own localization strings
+         */
+        [HarmonyPrefix]
+        [HarmonyPatch(typeof(Loc), "Initialize")]
+        static bool AddLocalization(ref Dictionary<string, string> localization) {
+            localization.AddRange(CreativeModeLocalization.English);
+            return true;
+        }
+
+        [HarmonyPrefix]
+        [HarmonyPatch(typeof(BlockObjectTool), "DevModeTool", MethodType.Getter)]
+        static bool ShowRuinsTool(ref bool __result) {
+            __result = false;
+            return false;
+        }
+
+        [HarmonyPostfix]
+        [HarmonyPatch(typeof(ToolGroupButton), "ContainsTool")]
+        static void HideOldMapEditorTool(ToolGroup ____toolGroup, ref bool __result) {
+            if (____toolGroup.DisplayNameLocKey.Equals("ToolGroups.MapEditor")) {
+                __result = false;
             }
         }
     }
