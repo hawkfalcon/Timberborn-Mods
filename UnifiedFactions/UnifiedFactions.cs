@@ -185,7 +185,7 @@ namespace UnifiedFactionsPlugin {
                     "block-object-rotation-panel__button"
                 },
                 style = {
-                    color = new Color(0.75f, 0.65f, 0.44f)
+                    color = Color.white
                 }
             };
 

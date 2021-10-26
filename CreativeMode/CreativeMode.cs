@@ -48,7 +48,7 @@ namespace CreativeModePlugin {
         [HarmonyPrefix]
         [HarmonyPatch(typeof(BuildingUnlockingService), "Unlocked")]
         static bool BuildingUnlocker(ref bool __result) {
-            if (!creativeModeEnabled || !disableScienceCost.Value) {
+            if (!(creativeModeEnabled && disableScienceCost.Value)) {
                 return true;
             }
             __result = true;
@@ -61,7 +61,7 @@ namespace CreativeModePlugin {
         [HarmonyPrefix]
         [HarmonyPatch(typeof(BuildingPlacer), "Place")]
         static bool PlaceInstantly(BlockObject prefab) {
-            if (!creativeModeEnabled || enableInstantBuilding.Value) {
+            if (creativeModeEnabled && enableInstantBuilding.Value) {
                 Building component = prefab.GetComponent<Building>();
                 component.PlaceFinished = true;
             }
@@ -126,12 +126,14 @@ namespace CreativeModePlugin {
          */
         [HarmonyPostfix]
         [HarmonyPatch(typeof(OptionsBox), "GetPanel")]
-        static void AddCreativeModeToggle(ref VisualElement __result) {
+        static void AddCreativeModeToggle(ref VisualElement __result, OptionsBox __instance) {
             VisualElement root = __result.Children().First();
             IEnumerable<string> buttonStyle = root.Children().First().GetClasses();
 
-            Button button = CreateButton("Toggle Creative Mode", buttonStyle);
-            button.clicked += ToggleCreativeMode;
+            string text = "Toggle Creative Mode " + (creativeModeEnabled ? "Off" : "On");
+            Button button = CreateButton(text, buttonStyle);
+            OptionsBox optionsBox = __instance;
+            button.clicked += () => ToggleCreativeMode(__instance);
             root.Insert(4, button);
         }
 
@@ -147,8 +149,9 @@ namespace CreativeModePlugin {
             return button;
         }
 
-        public static void ToggleCreativeMode() {
+        public static void ToggleCreativeMode(OptionsBox optionsBox) {
             creativeModeEnabled = !creativeModeEnabled;
+            optionsBox.ResumeClicked();
         }
     }
 }
