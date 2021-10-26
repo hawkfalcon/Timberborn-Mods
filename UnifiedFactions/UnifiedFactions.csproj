@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <AssemblyName>Unified Factions</AssemblyName>
+    <Description>Unlock all faction buildings</Description>
+    <Version>1.0.0</Version>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <LangVersion>9.0</LangVersion>
+    <ReleaseVersion>1.3</ReleaseVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BepInEx.Analyzers" Version="1.0.6" PrivateAssets="all" />
+    <PackageReference Include="BepInEx.Core" Version="5.4.16" />
+    <PackageReference Include="BepInEx.PluginInfoProps" Version="1.1.0" />
+    <PackageReference Include="UnityEngine.Modules" Version="2021.1.25" IncludeAssets="compile" />
+    <Reference Include="../lib/*.dll" />
+    <Reference Include="System.Collections.Immutable, Version=5.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+    <PackageReference Include="System.Collections.Immutable" Version="5.0.0" />
+  </ItemGroup>
+  
+  <ItemGroup Condition="'$(TargetFramework.TrimEnd(`0123456789`))' == 'net'">
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.2" PrivateAssets="all" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="System.Collections.Immutable, Version=5.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+    <None Remove="System.Collections.Immutable" />
+  </ItemGroup>
+</Project>
