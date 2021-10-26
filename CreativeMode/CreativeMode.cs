@@ -6,28 +6,27 @@ using Timberborn.ScienceSystem;
 using Timberborn.BuildingTools;
 using Timberborn.BlockSystem;
 using Timberborn.Buildings;
-using Timberborn.FactionSystemGame;
-using Timberborn.FactionSystem;
-using Timberborn.AssetSystem;
 using Timberborn.MasterScene;
 using Timberborn.BlockObjectTools;
 using Timberborn.Localization;
+using Timberborn.ToolSystem;
+using Timberborn.Options;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 using CreativeMode;
 using MonoMod.Utils;
-using Timberborn.ToolSystem;
-using Timberborn.PrefabOptimization;
+using UnityEngine.UIElements;
 
 namespace CreativeModePlugin {
 
-    [BepInPlugin("com.hawkfalcon.plugin.creativemode", "Creative Mode", "1.3.0.0")]
+    [BepInPlugin("com.hawkfalcon.plugin.creativemode", "Creative Mode", "1.3.1")]
     [HarmonyPatch]
     public class CreativeModePlugin : BaseUnityPlugin {
+
+        static bool creativeModeEnabled = true;
+
         private static ConfigEntry<bool> disableScienceCost;
-        private static ConfigEntry<bool> enableInstantBuilding; 
-        private static ConfigEntry<bool> enableAllFactionBuildings;
+        private static ConfigEntry<bool> enableInstantBuilding;
         private static ConfigEntry<bool> enableMapEditorTools;
 
         public void OnEnable() {
@@ -35,8 +34,6 @@ namespace CreativeModePlugin {
                "DisableScienceCost", true, "Placing anything no longer requires science");
             enableInstantBuilding = Config.Bind("General.Features",
                "EnableInstantBuilding", true, "Anything that is placed is instantly built at no cost");
-            enableAllFactionBuildings = Config.Bind("General.Features",
-               "EnableAllFactionBuildings", true, "Unlocks access to ALL faction buildings");
             enableMapEditorTools = Config.Bind("General.Features",
                 "EnableMapEditorTools", true, "Unlocks many map editor tools while playing");
 
@@ -51,7 +48,7 @@ namespace CreativeModePlugin {
         [HarmonyPrefix]
         [HarmonyPatch(typeof(BuildingUnlockingService), "Unlocked")]
         static bool BuildingUnlocker(ref bool __result) {
-            if (!disableScienceCost.Value) {
+            if (!creativeModeEnabled || !disableScienceCost.Value) {
                 return true;
             }
             __result = true;
@@ -64,45 +61,11 @@ namespace CreativeModePlugin {
         [HarmonyPrefix]
         [HarmonyPatch(typeof(BuildingPlacer), "Place")]
         static bool PlaceInstantly(BlockObject prefab) {
-            if (enableInstantBuilding.Value) {
+            if (!creativeModeEnabled || enableInstantBuilding.Value) {
                 Building component = prefab.GetComponent<Building>();
                 component.PlaceFinished = true;
             }
             return true;
-        }
-
-        /*
-         * Unlock all faction uniques
-         */
-        [HarmonyPrefix]
-        [HarmonyPatch(typeof(FactionObjectCollection), "GetObjects")]
-        static bool UnlockFactionUniques(FactionService ____factionService, IResourceAssetLoader ____resourceAssetLoader, ref IEnumerable<Object> __result) {
-            if (!enableAllFactionBuildings.Value) {
-                return true;
-            }
-            List<FactionSpecification> factions = Traverse.Create(____factionService)
-                .Field("_factionSpecificationService").Field("_factions").GetValue() as List<FactionSpecification>;
-
-            List<string> buildings = new();
-            foreach (FactionSpecification factionSpecification in factions) {
-                buildings.AddRange(factionSpecification.UniqueBuildings);
-            }
-            buildings.AddRange(____factionService.Current.CommonBuildings);
-            __result = (from path in buildings select ____resourceAssetLoader.Load<GameObject>(path));
-            return false;
-        }
-
-        /**
-         * If everything is unique, nothing is unique
-         */
-        [HarmonyPrefix]
-        [HarmonyPatch(typeof(UniqueBuildingCollection), "IsUnique")]
-        static bool UnlockAllUniques(ref bool __result) {
-            if (!enableAllFactionBuildings.Value) {
-                return true;
-            }
-            __result = false;
-            return false;
         }
 
         /**
@@ -137,6 +100,9 @@ namespace CreativeModePlugin {
             return true;
         }
 
+        /**
+         * Show the Ruins tool
+         */
         [HarmonyPrefix]
         [HarmonyPatch(typeof(BlockObjectTool), "DevModeTool", MethodType.Getter)]
         static bool ShowRuinsTool(ref bool __result) {
@@ -144,6 +110,9 @@ namespace CreativeModePlugin {
             return false;
         }
 
+        /**
+         * The [...] tool appears, let's remove it
+         */
         [HarmonyPostfix]
         [HarmonyPatch(typeof(ToolGroupButton), "ContainsTool")]
         static void HideOldMapEditorTool(ToolGroup ____toolGroup, ref bool __result) {
@@ -152,11 +121,34 @@ namespace CreativeModePlugin {
             }
         }
 
-        [HarmonyPrefix]
-        [HarmonyPatch(typeof(AutoAtlaser), "TooManyAtlases")]
-        static bool HideWarning(ref bool __result) {
-            __result = false;
-            return false;
+        /**
+         * Add a toggle button to the settings
+         */
+        [HarmonyPostfix]
+        [HarmonyPatch(typeof(OptionsBox), "GetPanel")]
+        static void AddCreativeModeToggle(ref VisualElement __result) {
+            VisualElement root = __result.Children().First();
+            IEnumerable<string> buttonStyle = root.Children().First().GetClasses();
+
+            Button button = CreateButton("Toggle Creative Mode", buttonStyle);
+            button.clicked += ToggleCreativeMode;
+            root.Insert(4, button);
+        }
+
+        /**
+         * Create a menu button
+         */
+        private static Button CreateButton(string name, IEnumerable<string> styles) {
+            Button button = new();
+            button.text = name;
+            foreach (string style in styles) {
+                button.AddToClassList(style);
+            }
+            return button;
+        }
+
+        public static void ToggleCreativeMode() {
+            creativeModeEnabled = !creativeModeEnabled;
         }
     }
 }
