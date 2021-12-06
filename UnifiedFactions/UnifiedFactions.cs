@@ -12,6 +12,10 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using Timberborn.CoreUI;
 using Timberborn.PrefabOptimization;
+using Timberborn.PlantingUI;
+using Timberborn.Planting;
+using Timberborn.EntitySystem;
+using Timberborn.Localization;
 
 namespace UnifiedFactionsPlugin {
 
@@ -150,6 +154,18 @@ namespace UnifiedFactionsPlugin {
         [HarmonyPatch(typeof(AutoAtlaser), "TooManyAtlases")]
         static bool HideWarning(ref bool __result) {
             __result = false;
+            return false;
+        }
+
+        /**
+         * Fix a weird farm bug - Single->First (hopefully I can remove this in the future)
+         */
+        [HarmonyPrefix]
+        [HarmonyPatch(typeof(PlantingToolButtonFactory), "GetPlanterBuildingName")]
+        static bool FarmFix(ref string __result, Plantable plantable, ObjectCollectionService ____objectCollectionService, ILoc ____loc) {
+            string displayNameLocKey = ____objectCollectionService.GetAllMonoBehaviours<PlanterBuilding>().First((PlanterBuilding building) =>
+                building.PlantablePrefabNames.Contains(plantable.PrefabName)).GetComponent<LabeledPrefab>().DisplayNameLocKey;
+            __result = ____loc.T(displayNameLocKey);
             return false;
         }
 
