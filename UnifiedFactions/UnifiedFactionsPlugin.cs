@@ -16,21 +16,17 @@ using Timberborn.PlantingUI;
 using Timberborn.Planting;
 using Timberborn.EntitySystem;
 using Timberborn.Localization;
+using TimberbornAPI;
+using UnifiedFactions;
 
-namespace UnifiedFactionsPlugin {
+namespace UnifiedFactions {
 
-    [BepInPlugin("com.hawkfalcon.plugin.unifiedfactions", "Unified Factions", "1.0.0")]
+    [BepInPlugin("com.hawkfalcon.plugin.unifiedfactions", "Unified Factions", "1.0.1")]
     [HarmonyPatch]
     public class UnifiedFactionsPlugin : BaseUnityPlugin {
 
-        static ToolGroupButton currentToolGroupButton = null;
-        static BlockObjectTool currentTool = null;
-
-        static IEnumerable<Object> factionObjectCache = null;
-        static readonly List<string> duplicateBuildings = new();
-
-        // TODO: when they add more factions, make this an enum
-        public static bool showFolktails = true;
+        public static readonly List<string> DuplicateBuildings = new();
+        private static IEnumerable<Object> factionObjectCache = null;
 
         private static ConfigEntry<bool> enableAllFactionBuildings;
         private static ConfigEntry<bool> enableFactionLetters;
@@ -43,6 +39,8 @@ namespace UnifiedFactionsPlugin {
            
             var harmony = new Harmony("com.hawkfalcon.plugin.unifiedfactions");
             harmony.PatchAll();
+
+            TimberAPI.DependecyRegistry.AddConfigurator(new UnifiedFactionsConfigurator());
             Logger.LogInfo("Plugin Unified Factions is loaded!");
         }
 
@@ -72,13 +70,22 @@ namespace UnifiedFactionsPlugin {
                     string duplicateName = building.Substring(building.LastIndexOf('/') + 1);
                     // This is a lie, it is not Common
                     if (!duplicateName.Equals("LogPile.Folktails")) {
-                        duplicateBuildings.Add(duplicateName);
+                        DuplicateBuildings.Add(duplicateName);
                     }
                 }
             }
             __result = (from path in buildings select ____resourceAssetLoader.Load<GameObject>(path));
             factionObjectCache = __result;
             return false;
+        }
+
+        /**
+         * Get Factions
+         */
+        private static List<FactionSpecification> GetFactions(FactionService factionService)
+        {
+            return Traverse.Create(factionService).Field("_factionSpecificationService").
+                Field("_factions").GetValue() as List<FactionSpecification>;
         }
 
         /**
@@ -101,7 +108,7 @@ namespace UnifiedFactionsPlugin {
                 }
 
                 // Mark unique faction buildings
-                if (!duplicateBuildings.Contains(name) && text != "") {
+                if (!DuplicateBuildings.Contains(name) && text != "") {
                     text += "*";
                 }
 
@@ -122,37 +129,27 @@ namespace UnifiedFactionsPlugin {
         }
 
         /**
-         * Keep track of clicked tool group, refresh to current state
+         * Keep track of clicked tool group button, refresh to current state
          */
         [HarmonyPostfix]
         [HarmonyPatch(typeof(ToolGroupButton), "OnToolGroupEntered")]
-        static void CurrentButtonGroup(ToolGroupButton __instance, ToolGroupEnteredEvent toolGroupEnteredEvent, ToolGroup ____toolGroup) {
-            if (toolGroupEnteredEvent.ToolGroup == ____toolGroup) {
-                currentToolGroupButton = __instance;
-                refreshSection(null);
+        static void CurrentButtonGroup(ToolGroupButton __instance, ToolGroupEnteredEvent toolGroupEnteredEvent, ToolGroup ____toolGroup)
+        {
+            if (toolGroupEnteredEvent.ToolGroup == ____toolGroup)
+            {
+                ToolButtonModifier.CurrentToolGroupButton = __instance;
+                ToolButtonModifier.RefreshSection(null);
             }
         }
 
-        /**
-         * Keep track of clicked tool, only show Toggle Button for duplicate buildings
-         */
-        [HarmonyPostfix]
-        [HarmonyPatch(typeof(BlockObjectRotationPanel), "OnToolEntered")]
-        static void CurrentButton(ToolEnteredEvent toolEnteredEvent, VisualElement ____root) {
-            currentTool = toolEnteredEvent.Tool as BlockObjectTool;
-
-            if (currentTool != null) {
-                bool isDuplicate = duplicateBuildings.Contains(currentTool.Prefab.name);
-                ____root.Children().Skip(2).First().ToggleDisplayStyle(isDuplicate);
-            }
-        }
-
+        // ALL THE LITTLE FIXES
         /**
          * Yes, I know I'm loading more than one atlas!
          */
         [HarmonyPrefix]
         [HarmonyPatch(typeof(AutoAtlaser), "TooManyAtlases")]
-        static bool HideWarning(ref bool __result) {
+        static bool HideWarning(ref bool __result)
+        {
             __result = false;
             return false;
         }
@@ -180,90 +177,6 @@ namespace UnifiedFactionsPlugin {
             }
             __result = false;
             return false;
-        }
-
-        /**
-         * Add a Toggle Faction button to the top of the panel
-         */
-        [HarmonyPostfix]
-        [HarmonyPatch(typeof(BlockObjectRotationPanel), "InitializeFragment")]
-        static void AddToggleButton(ref VisualElement __result) {
-            if (!enableAllFactionBuildings.Value) {
-                return;
-            }
-
-            NineSliceButton button = new() {
-                text = "Toggle Faction",
-                classList = {
-                    "unity-text-element",
-                    "unity-button",
-                    "button-game",
-                    "block-object-rotation-panel__button"
-                },
-                style = {
-                    color = Color.white
-                }
-            };
-
-            button.clicked += ToggleFaction;
-            __result.Add(button);
-        }
-
-        static void ToggleFaction() {
-            showFolktails = !showFolktails;
-            if (currentToolGroupButton != null && currentTool != null) {
-                refreshSection(currentTool.Prefab.name);
-            }
-        }
-
-        /**
-         * Hide and show duplicate buttons based on currently selected faction,
-         * and automatically select the other tool
-         */
-        private static void refreshSection(string selectedToolName) {
-            foreach (ToolButton button in currentToolGroupButton._toolButtons) {
-                if (button.Tool is BlockObjectTool otherTool) {
-                    string otherToolName = otherTool.Prefab.name;
-                    if (selectedToolName != null) {
-                        selectOtherTool(button, otherToolName, selectedToolName);
-                    }
-                    showOneDuplicate(otherToolName, button);
-                }
-            }
-        }
-
-        /**
-         * Automatically select the tool of the other faction
-         * [tool names are Building.FactionName]
-         */
-        private static void selectOtherTool(ToolButton button, string otherToolName, string selectedToolName) {
-            string otherToolId = otherToolName.Split(".")[0];
-            string selectedToolId = selectedToolName.Split(".")[0];
-            if (otherToolId.Equals(selectedToolId) && !otherToolName.Equals(selectedToolName)) {
-                button._toolManager.SwitchTool(button.Tool);
-            }
-        }
-
-        /**
-         * Hide the other duplicate button
-         */
-        private static bool showOneDuplicate(string name, ToolButton button) {
-            if (duplicateBuildings.Contains(name) && button.ToolEnabled) {
-                string factionId = showFolktails ? "Folktails" : "IronTeeth";
-                bool visibility = name.Contains(factionId);
-                button.Root.ToggleDisplayStyle(visibility);
-                return true;
-            }
-            return false;
-        }
-
-        /**
-         * Get Factions
-         */
-        private static List<FactionSpecification> GetFactions(FactionService factionService) {
-            return Traverse.Create(factionService).Field("_factionSpecificationService").
-                Field("_factions").GetValue() as List<FactionSpecification>;
-
         }
     }
 }
