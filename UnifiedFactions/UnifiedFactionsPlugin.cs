@@ -18,6 +18,8 @@ using Timberborn.EntitySystem;
 using Timberborn.Localization;
 using TimberbornAPI;
 using UnifiedFactions;
+using Timberborn.ToolPanelSystem;
+using System.Collections.Immutable;
 
 namespace UnifiedFactions {
 
@@ -140,6 +142,36 @@ namespace UnifiedFactions {
                 ToolButtonModifier.CurrentToolGroupButton = __instance;
                 ToolButtonModifier.RefreshSection(null);
             }
+        }
+
+        /**
+         * Reorder ToolPanel to insert FactionTogglePanel earlier.
+         * I want to add this functionality to TimberAPI at some point
+         */
+        [HarmonyPrefix]
+        [HarmonyPatch(typeof(ToolPanel), "AddFragments")]
+        static bool ReorderToolPanel(VisualElement root, ImmutableArray<ToolPanelModule> ____toolPanelModules)
+        {
+            Dictionary<float, IToolFragment> dictionary = new();
+            ImmutableArray<ToolPanelModule>.Enumerator enumerator = ____toolPanelModules.GetEnumerator();
+            while (enumerator.MoveNext())
+            {
+                foreach (KeyValuePair<int, IToolFragment> toolPanelFragment in enumerator.Current.ToolPanelFragments)
+                {
+                    float key = toolPanelFragment.Key;
+                    if (toolPanelFragment.Value is FactionTogglePanel)
+                    {
+                        key = 2.5f;
+                    }
+                    dictionary.Add(key, toolPanelFragment.Value);
+                }
+            }
+            foreach (float item in dictionary.Keys.OrderByDescending((float key) => key))
+            {
+                IToolFragment toolFragment = dictionary[item];
+                root.Add(toolFragment.InitializeFragment());
+            }
+            return false;
         }
 
         // ALL THE LITTLE FIXES
