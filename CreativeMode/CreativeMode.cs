@@ -19,7 +19,7 @@ using UnityEngine.UIElements;
 
 namespace CreativeModePlugin {
 
-    [BepInPlugin("com.hawkfalcon.plugin.creativemode", "Creative Mode", "1.3.1")]
+    [BepInPlugin("com.hawkfalcon.plugin.creativemode", "Creative Mode", "1.4.0")]
     [HarmonyPatch]
     public class CreativeModePlugin : BaseUnityPlugin {
 
