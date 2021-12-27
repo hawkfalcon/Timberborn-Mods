@@ -33,6 +33,10 @@ namespace UnifiedFactions {
         private static ConfigEntry<bool> enableAllFactionBuildings;
         private static ConfigEntry<bool> enableFactionLetters;
 
+        private static ICollection<string> _notCommon = new[] {
+            "LogPile.Folktails", "WaterPump.Folktails", "MechanicalWaterPump.Folktails", "WaterWheel.Folktails", "Mine.Folktails"
+        };
+
         public void OnEnable() {
             enableAllFactionBuildings = Config.Bind("General.Features",
                "EnableAllFactionBuildings", true, "Unlocks access to ALL faction buildings");
@@ -71,7 +75,7 @@ namespace UnifiedFactions {
                 foreach (string building in factionSpecification.CommonBuildings) {
                     string duplicateName = building.Substring(building.LastIndexOf('/') + 1);
                     // This is a lie, it is not Common
-                    if (!duplicateName.Equals("LogPile.Folktails")) {
+                    if (!_notCommon.Contains(duplicateName)) {
                         DuplicateBuildings.Add(duplicateName);
                     }
                 }
