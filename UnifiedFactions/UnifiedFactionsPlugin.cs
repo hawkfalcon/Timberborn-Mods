@@ -23,7 +23,7 @@ using System.Collections.Immutable;
 
 namespace UnifiedFactions {
 
-    [BepInPlugin("com.hawkfalcon.plugin.unifiedfactions", "Unified Factions", "1.0.1")]
+    [BepInPlugin("com.hawkfalcon.plugin.unifiedfactions", "Unified Factions", "1.1.0")]
     [HarmonyPatch]
     public class UnifiedFactionsPlugin : BaseUnityPlugin {
 
@@ -67,7 +67,7 @@ namespace UnifiedFactions {
             }
 
             List<string> buildings = new();
-            foreach (FactionSpecification factionSpecification in GetFactions(____factionService)) {
+            foreach (FactionSpecification factionSpecification in ____factionService._factionSpecificationService._factions) {
                 buildings.AddRange(factionSpecification.UniqueBuildings);
                 buildings.AddRange(factionSpecification.CommonBuildings);
 
@@ -83,15 +83,6 @@ namespace UnifiedFactions {
             __result = (from path in buildings select ____resourceAssetLoader.Load<GameObject>(path));
             factionObjectCache = __result;
             return false;
-        }
-
-        /**
-         * Get Factions
-         */
-        private static List<FactionSpecification> GetFactions(FactionService factionService)
-        {
-            return Traverse.Create(factionService).Field("_factionSpecificationService").
-                Field("_factions").GetValue() as List<FactionSpecification>;
         }
 
         /**
