@@ -98,26 +98,12 @@ namespace CreativeMode {
         [HarmonyPostfix]
         [HarmonyPatch(typeof(OptionsBox), "GetPanel")]
         static void AddCreativeModeToggle(ref VisualElement __result, OptionsBox __instance) {
-            VisualElement root = __result.Children().First();
-            IEnumerable<string> buttonStyle = root.Children().First().GetClasses();
+            VisualElement root = __result.Query("OptionsBox");
+            Button button = new() { classList = { "menu-button" } };
 
-            string text = "Toggle Creative Mode " + (Enabled ? "Off" : "On");
-            Button button = CreateButton(text, buttonStyle);
-            OptionsBox optionsBox = __instance;
+            button.text = "Toggle Creative Mode " + (Enabled ? "Off" : "On");
             button.clicked += () => ToggleCreativeMode(__instance);
             root.Insert(4, button);
-        }
-
-        /**
-         * Create a menu button
-         */
-        private static Button CreateButton(string name, IEnumerable<string> styles) {
-            Button button = new();
-            button.text = name;
-            foreach (string style in styles) {
-                button.AddToClassList(style);
-            }
-            return button;
         }
 
         public static void ToggleCreativeMode(OptionsBox optionsBox) {
