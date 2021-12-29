@@ -23,7 +23,7 @@ using System.Collections.Immutable;
 
 namespace UnifiedFactions {
 
-    [BepInPlugin("com.hawkfalcon.plugin.unifiedfactions", "Unified Factions", "1.1.0")]
+    [BepInPlugin("com.hawkfalcon.plugin.unifiedfactions", "Unified Factions", "1.1.1")]
     [HarmonyPatch]
     public class UnifiedFactionsPlugin : BaseUnityPlugin {
 
@@ -46,7 +46,7 @@ namespace UnifiedFactions {
             var harmony = new Harmony("com.hawkfalcon.plugin.unifiedfactions");
             harmony.PatchAll();
 
-            TimberAPI.DependecyRegistry.AddConfigurator(new UnifiedFactionsConfigurator());
+            TimberAPI.DependencyRegistry.AddConfigurator(new UnifiedFactionsConfigurator());
             Logger.LogInfo("Plugin Unified Factions is loaded!");
         }
 
