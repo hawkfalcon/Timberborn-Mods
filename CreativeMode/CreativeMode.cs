@@ -39,6 +39,9 @@ namespace CreativeModePlugin {
                 "EnableMapEditorTools", true, "Unlocks many map editor tools while playing");
 
             TimberAPI.Localization.AddLabel("CreativeMode.ToolGroups.MapEditor", "Map editor tools");
+            if (enableMapEditorTools.Value) {
+                TimberAPI.DependencyRegistry.AddConfigurator(new MapEditorButtonsConfigurator());
+            }
             new Harmony("com.hawkfalcon.plugin.creativemode").PatchAll();
 
             Logger.LogInfo("Plugin Creative Mode is loaded!");
@@ -78,18 +81,6 @@ namespace CreativeModePlugin {
         static bool ShowDeleteTool(ref bool __result) {
             __result = false;
             return false;
-        }
-
-        /**
-         * Inject our own buttons which are present in Map Editor
-         */
-        [HarmonyPostfix]
-        [HarmonyPatch(typeof(MasterSceneConfigurator), "Configure")]
-        static void InjectMapEditorButtons(IContainerDefinition containerDefinition) {
-            if (enableMapEditorTools.Value) {
-                containerDefinition.Bind<MapEditorGroupedButtons>().AsSingleton();
-                containerDefinition.Install((IConfigurator)(object)new MapEditorButtonsConfigurator());
-            }
         }
 
         /**

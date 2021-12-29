@@ -5,8 +5,8 @@ using Bindito.Core;
 
 namespace CreativeMode {
     /**
-         * Modified from MapEditorConfigurator
-         */
+    * Modified from MapEditorConfigurator
+    */
     public class MapEditorButtonsConfigurator : IConfigurator {
 
         private class ToolPanelModuleProvider : IProvider<ToolPanelModule> {
@@ -50,6 +50,8 @@ namespace CreativeMode {
         }
 
         public void Configure(IContainerDefinition containerDefinition) {
+            containerDefinition.Bind<MapEditorGroupedButtons>().AsSingleton();
+
             containerDefinition.Bind<MapEditorToolGroup>().AsSingleton();
             containerDefinition.Bind<MapEditorButtons>().AsSingleton();
 
