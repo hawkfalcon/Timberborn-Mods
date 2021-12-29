@@ -16,6 +16,7 @@ using System.Linq;
 using CreativeMode;
 using MonoMod.Utils;
 using UnityEngine.UIElements;
+using TimberbornAPI;
 
 namespace CreativeModePlugin {
 
@@ -37,8 +38,9 @@ namespace CreativeModePlugin {
             enableMapEditorTools = Config.Bind("General.Features",
                 "EnableMapEditorTools", true, "Unlocks many map editor tools while playing");
 
-            var harmony = new Harmony("com.hawkfalcon.plugin.creativemode");
-            harmony.PatchAll();
+            TimberAPI.Localization.AddLabel("CreativeMode.ToolGroups.MapEditor", "Map editor tools");
+            new Harmony("com.hawkfalcon.plugin.creativemode").PatchAll();
+
             Logger.LogInfo("Plugin Creative Mode is loaded!");
         }
 
@@ -88,16 +90,6 @@ namespace CreativeModePlugin {
                 containerDefinition.Bind<MapEditorGroupedButtons>().AsSingleton();
                 containerDefinition.Install((IConfigurator)(object)new MapEditorButtonsConfigurator());
             }
-        }
-
-        /**
-         * Add my own localization strings
-         */
-        [HarmonyPrefix]
-        [HarmonyPatch(typeof(Loc), "Initialize")]
-        static bool AddLocalization(ref Dictionary<string, string> localization) {
-            localization.AddRange(CreativeModeLocalization.English);
-            return true;
         }
 
         /**
