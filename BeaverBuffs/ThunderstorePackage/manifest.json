@@ -4,7 +4,6 @@
     "website_url": "https://github.com/hawkfalcon/Timberborn-Mods",
     "description": "This mod buffs your Beavers speed, strength, etc",
     "dependencies": [
-        "BepInEx-BepInExPack_Timberborn-5.4.15",
-        "Timberborn_Central-TimberAPI-0.2.0"
+        "Timberborn_Central-TimberAPI-0.3.0"
     ]
 }
