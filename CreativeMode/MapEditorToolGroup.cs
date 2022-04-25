@@ -1,7 +1,7 @@
 ﻿using Timberborn.ToolSystem;
-using Timberborn.WaterSystemRendering;
+
 namespace CreativeMode {
-    public class MapEditorToolGroup : ToolGroup, IWaterHider {
+    public class MapEditorToolGroup : ToolGroup {
 		private static readonly string RelativeTerrainHeightBrushImageKey = "RelativeTerrainHeightBrushIcon";
 
 		public override string IconName => RelativeTerrainHeightBrushImageKey;

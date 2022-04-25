@@ -1,26 +1,16 @@
 ﻿using BepInEx;
 using BepInEx.Configuration;
 using HarmonyLib;
-using Bindito.Core;
 using Timberborn.ScienceSystem;
-using Timberborn.BuildingTools;
-using Timberborn.BlockSystem;
-using Timberborn.Buildings;
-using Timberborn.MasterScene;
 using Timberborn.BlockObjectTools;
-using Timberborn.Localization;
 using Timberborn.ToolSystem;
 using Timberborn.Options;
-using System.Collections.Generic;
-using System.Linq;
-using CreativeMode;
-using MonoMod.Utils;
 using UnityEngine.UIElements;
 using TimberbornAPI;
 
 namespace CreativeMode {
 
-    [BepInPlugin("com.hawkfalcon.plugin.creativemode", "Creative Mode", "1.4.0")]
+    [BepInPlugin("com.hawkfalcon.plugin.creativemode", "Creative Mode", "1.4.1")]
     [HarmonyPatch]
     public class CreativeModePlugin : BaseUnityPlugin {
 

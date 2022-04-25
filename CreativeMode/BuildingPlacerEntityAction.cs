@@ -1,5 +1,4 @@
-﻿using System;
-using Timberborn.Buildings;
+﻿using Timberborn.Buildings;
 using Timberborn.ConstructibleSystem;
 using TimberbornAPI.EntityActionSystem;
 using UnityEngine;
