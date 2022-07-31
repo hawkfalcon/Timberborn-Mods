@@ -23,7 +23,7 @@ using System.Collections.Immutable;
 
 namespace UnifiedFactions {
 
-    [BepInPlugin("com.hawkfalcon.plugin.unifiedfactions", "Unified Factions", "1.1.1")]
+    [BepInPlugin("com.hawkfalcon.plugin.unifiedfactions", "Unified Factions", "1.2.0")]
     [HarmonyPatch]
     public class UnifiedFactionsPlugin : BaseUnityPlugin {
 
@@ -188,7 +188,7 @@ namespace UnifiedFactions {
         [HarmonyPatch(typeof(PlantingToolButtonFactory), "GetPlanterBuildingName")]
         static bool FarmFix(ref string __result, Plantable plantable, ObjectCollectionService ____objectCollectionService, ILoc ____loc) {
             string displayNameLocKey = ____objectCollectionService.GetAllMonoBehaviours<PlanterBuilding>().First((PlanterBuilding building) =>
-                building.PlantablePrefabNames.Contains(plantable.PrefabName)).GetComponent<LabeledPrefab>().DisplayNameLocKey;
+                building.PlantableResourceGroup.Contains(plantable.ResourceGroup)).GetComponent<LabeledPrefab>().DisplayNameLocKey;
             __result = ____loc.T(displayNameLocKey);
             return false;
         }
