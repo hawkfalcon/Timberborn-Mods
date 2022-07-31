@@ -10,7 +10,7 @@ using TimberbornAPI;
 
 namespace CreativeMode {
 
-    [BepInPlugin("com.hawkfalcon.plugin.creativemode", "Creative Mode", "1.4.1")]
+    [BepInPlugin("com.hawkfalcon.plugin.creativemode", "Creative Mode", "1.5.0")]
     [HarmonyPatch]
     public class CreativeModePlugin : BaseUnityPlugin {
 

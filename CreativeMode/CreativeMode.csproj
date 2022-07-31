@@ -4,14 +4,13 @@
     <TargetFramework>netstandard2.1</TargetFramework>
     <AssemblyName>Creative Mode</AssemblyName>
     <Description>Place anything, anytime</Description>
-    <Version>1.4.0</Version>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <LangVersion>9.0</LangVersion>
-    <ReleaseVersion>1.4.1</ReleaseVersion>
+    <ReleaseVersion>1.5.0</ReleaseVersion>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="TimberAPI" Version="0.3.0" />
+    <PackageReference Include="TimberAPI" Version="0.4.2" />
   </ItemGroup>
   
   <ItemGroup Condition="'$(TargetFramework.TrimEnd(`0123456789`))' == 'net'">
