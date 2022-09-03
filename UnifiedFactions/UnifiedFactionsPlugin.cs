@@ -34,7 +34,7 @@ namespace UnifiedFactions {
         private static ConfigEntry<bool> enableFactionLetters;
 
         private static ICollection<string> _notCommon = new[] {
-            "LogPile.Folktails", "WaterPump.Folktails", "MechanicalWaterPump.Folktails", "WaterWheel.Folktails", "Mine.Folktails"
+            "LogPile.Folktails", "WaterPump.Folktails", "MechanicalWaterPump.Folktails", "Mine.Folktails", "Observatory.Folktails"
         };
 
         public void OnEnable() {
@@ -74,6 +74,10 @@ namespace UnifiedFactions {
                 // Keep track of all duplicate names
                 foreach (string building in factionSpecification.CommonBuildings) {
                     string duplicateName = building.Substring(building.LastIndexOf('/') + 1);
+                    if ((building.Contains("MedicalBed") || building.Contains("Dev")) && factionSpecification.Id == "IronTeeth")
+                    {
+                        buildings.Remove(building);
+                    }
                     // This is a lie, it is not Common
                     if (!_notCommon.Contains(duplicateName)) {
                         DuplicateBuildings.Add(duplicateName);
