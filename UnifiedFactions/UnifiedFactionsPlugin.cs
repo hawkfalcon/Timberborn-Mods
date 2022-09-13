@@ -20,6 +20,7 @@ using TimberbornAPI;
 using UnifiedFactions;
 using Timberborn.ToolPanelSystem;
 using System.Collections.Immutable;
+using System.IO;
 
 namespace UnifiedFactions {
 
@@ -27,15 +28,11 @@ namespace UnifiedFactions {
     [HarmonyPatch]
     public class UnifiedFactionsPlugin : BaseUnityPlugin {
 
-        public static readonly List<string> DuplicateBuildings = new();
+        public static readonly List<string> ToggleableBuildings = new();
         private static IEnumerable<Object> factionObjectCache = null;
 
         private static ConfigEntry<bool> enableAllFactionBuildings;
         private static ConfigEntry<bool> enableFactionLetters;
-
-        private static ICollection<string> _notCommon = new[] {
-            "LogPile.Folktails", "WaterPump.Folktails", "MechanicalWaterPump.Folktails", "Mine.Folktails", "Observatory.Folktails"
-        };
 
         public void OnEnable() {
             enableAllFactionBuildings = Config.Bind("General.Features",
@@ -65,28 +62,70 @@ namespace UnifiedFactions {
                 __result = factionObjectCache;
                 return false;
             }
-
-            List<string> buildings = new();
-            foreach (FactionSpecification factionSpecification in ____factionService._factionSpecificationService._factions) {
-                buildings.AddRange(factionSpecification.UniqueBuildings);
-                buildings.AddRange(factionSpecification.CommonBuildings);
-
-                // Keep track of all duplicate names
-                foreach (string building in factionSpecification.CommonBuildings) {
-                    string duplicateName = building.Substring(building.LastIndexOf('/') + 1);
-                    if ((building.Contains("MedicalBed") || building.Contains("Dev")) && factionSpecification.Id == "IronTeeth")
+            List<GameObject> buildings = new();
+            List<string> prefabPaths = new();
+            List<string> preventDuplicatePrefabNames = new();
+            foreach (FactionSpecification factionSpecification in ____factionService._factionSpecificationService._factions)
+            {
+                foreach (string prefabPath in factionSpecification.CommonBuildings.Concat(factionSpecification.UniqueBuildings))
+                {
+                    // Don't add the same exact prefab twice (e.g. mods that use the same prefab for both)
+                    if (prefabPaths.Contains(prefabPath)) continue;
+                    GameObject gameObject = ____resourceAssetLoader.Load<GameObject>(prefabPath);
+                    if (gameObject == null)
                     {
-                        buildings.Remove(building);
+                        Debug.Log("GameObject " + prefabPath + " is empty, skipping!");
+                        continue;
                     }
-                    // This is a lie, it is not Common
-                    if (!_notCommon.Contains(duplicateName)) {
-                        DuplicateBuildings.Add(duplicateName);
+                    Prefab prefab = gameObject.GetComponent<Prefab>();
+                    if (prefab == null)
+                    {
+                        Debug.Log("Prefab " + prefabPath + " is empty, skipping!");
+                        continue;
                     }
+                    // For any faction other than current, we have to clear out the old prefab name to prevent duplicates
+                    if (____factionService.Current != factionSpecification)
+                    {
+                        prefab._backwardCompatiblePrefabNames = new string[0];
+                    }
+                    // Prevent duplicate prefab names, as we can't load them
+                    string prefabName = prefab.PrefabName;
+                    if (preventDuplicatePrefabNames.Contains(prefabName)) {
+                        Debug.Log(prefabPath + " contains duplicate prefab name, skipping: " + prefabName);
+                        continue;
+                    }
+
+                    TrackToggleableBuildings(prefabPath);
+                    preventDuplicatePrefabNames.Add(prefabName);
+                    prefabPaths.Add(prefabPath);
+                    buildings.Add(gameObject);
                 }
             }
-            __result = (from path in buildings select ____resourceAssetLoader.Load<GameObject>(path));
+            __result = buildings;
             factionObjectCache = __result;
             return false;
+        }
+
+        static Dictionary<string, string> prefabIdToName = new();
+        static void TrackToggleableBuildings(string prefabPath)
+        {
+            string prefabName = prefabPath.Substring(prefabPath.LastIndexOf('/') + 1);
+            // Track buildings with both '.Folktails and .IronTeeth' postfixes as toggleable
+            int index = prefabName.IndexOf(".");
+            if (index > 0)
+            {
+                string prefabId = prefabName.Substring(0, index);
+                if (prefabIdToName.TryGetValue(prefabId, out string otherPrefabName))
+                {
+                    ToggleableBuildings.Add(prefabName);
+                    ToggleableBuildings.Add(otherPrefabName);
+                    Debug.Log(prefabName + " " + otherPrefabName);
+                }
+                else
+                {
+                    prefabIdToName[prefabId] = prefabName;
+                }
+            }
         }
 
         /**
@@ -109,7 +148,7 @@ namespace UnifiedFactions {
                 }
 
                 // Mark unique faction buildings
-                if (!DuplicateBuildings.Contains(name) && text != "") {
+                if (!ToggleableBuildings.Contains(name) && text != "") {
                     text += "*";
                 }
 
@@ -139,7 +178,7 @@ namespace UnifiedFactions {
             if (toolGroupEnteredEvent.ToolGroup == ____toolGroup)
             {
                 ToolButtonModifier.CurrentToolGroupButton = __instance;
-                ToolButtonModifier.RefreshSection(null);
+                //ToolButtonModifier.RefreshSection(null);
             }
         }
 

@@ -51,7 +51,7 @@ namespace UnifiedFactions
          */
         private static bool ShowOneDuplicate(string name, ToolButton button)
         {
-            if (UnifiedFactionsPlugin.DuplicateBuildings.Contains(name) && button.ToolEnabled)
+            if (UnifiedFactionsPlugin.ToggleableBuildings.Contains(name) && button.ToolEnabled)
             {
                 string factionId = ShowFolktails ? "Folktails" : "IronTeeth";
                 bool visibility = name.Contains(factionId);

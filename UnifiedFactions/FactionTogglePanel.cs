@@ -52,8 +52,8 @@ namespace UnifiedFactions
 			if (toolEnteredEvent.Tool is BlockObjectTool tool)
 			{
 				currentTool = tool;
-				bool isDuplicate = UnifiedFactionsPlugin.DuplicateBuildings.Contains(currentTool.Prefab.name);
-				shouldShow = isDuplicate;
+				bool isToggleable = UnifiedFactionsPlugin.ToggleableBuildings.Contains(currentTool.Prefab.name);
+				shouldShow = isToggleable;
 			}
 			_root.ToggleDisplayStyle(shouldShow);
 		}
