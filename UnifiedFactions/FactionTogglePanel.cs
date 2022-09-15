@@ -38,7 +38,7 @@ namespace UnifiedFactions
 
         private static void ToggleFaction()
         {
-            ToolButtonModifier.ShowFolktails = !ToolButtonModifier.ShowFolktails;
+			UnifiedFactionsPlugin.BuildingVariants.NextFaction();
             if (ToolButtonModifier.CurrentToolGroupButton != null && currentTool != null)
             {
 				ToolButtonModifier.RefreshSection(currentTool.Prefab.name);
@@ -52,8 +52,8 @@ namespace UnifiedFactions
 			if (toolEnteredEvent.Tool is BlockObjectTool tool)
 			{
 				currentTool = tool;
-				bool isToggleable = UnifiedFactionsPlugin.ToggleableBuildings.Contains(currentTool.Prefab.name);
-				shouldShow = isToggleable;
+				string buildingName = currentTool.Prefab.name;
+                shouldShow = UnifiedFactionsPlugin.BuildingVariants.HasVariant(buildingName);
 			}
 			_root.ToggleDisplayStyle(shouldShow);
 		}

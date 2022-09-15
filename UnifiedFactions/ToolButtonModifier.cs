@@ -7,9 +7,6 @@ namespace UnifiedFactions
 {
     public class ToolButtonModifier
     {
-        // TODO: when they add more factions, make this an enum
-        public static bool ShowFolktails = true;
-
         public static ToolGroupButton CurrentToolGroupButton = null;
 
         /**
@@ -49,12 +46,11 @@ namespace UnifiedFactions
         /**
          * Hide the other duplicate button
          */
-        private static bool ShowOneDuplicate(string name, ToolButton button)
+        private static bool ShowOneDuplicate(string buildingName, ToolButton button)
         {
-            if (UnifiedFactionsPlugin.ToggleableBuildings.Contains(name) && button.ToolEnabled)
+            if (UnifiedFactionsPlugin.BuildingVariants.HasVariant(buildingName) && button.ToolEnabled)
             {
-                string factionId = ShowFolktails ? "Folktails" : "IronTeeth";
-                bool visibility = name.Contains(factionId);
+                bool visibility = UnifiedFactionsPlugin.BuildingVariants.IsVisible(buildingName);
                 button.Root.ToggleDisplayStyle(visibility);
                 return true;
             }
