@@ -17,7 +17,7 @@ namespace UnifiedFactions
         {
             foreach (ToolButton button in CurrentToolGroupButton._toolButtons)
             {
-                if (button.Tool is BlockObjectTool otherTool)
+                if (button != null && button.Tool is BlockObjectTool otherTool)
                 {
                     string otherToolName = otherTool.Prefab.name;
                     if (selectedToolName != null)

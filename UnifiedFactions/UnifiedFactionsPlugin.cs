@@ -70,8 +70,6 @@ namespace UnifiedFactions {
             {
                 foreach (string prefabPath in factionSpecification.CommonBuildings.Concat(factionSpecification.UniqueBuildings))
                 {
-                    // Don't add the same exact prefab twice (e.g. mods that use the same prefab for both)
-                    //if (prefabPaths.Contains(prefabPath)) continue;
                     GameObject gameObject = ____resourceAssetLoader.Load<GameObject>(prefabPath);
                     if (gameObject == null)
                     {
@@ -96,10 +94,6 @@ namespace UnifiedFactions {
                         Debug.Log(prefabPath + " contains duplicate prefab name, skipping: " + buildingName);
                         continue;
                     }
-
-                    //TrackToggleableBuildings(prefabPath);
-                    //preventDuplicatePrefabNames.Add(buildingName);
-                    //prefabPaths.Add(prefabPath);
                     buildings.Add(gameObject);
                 }
             }
@@ -107,28 +101,6 @@ namespace UnifiedFactions {
             factionObjectCache = __result;
             return false;
         }
-
-        //static Dictionary<string, string> prefabIdToName = new();
-        //static void TrackToggleableBuildings(string prefabPath)
-        //{
-        //    string prefabName = prefabPath.Substring(prefabPath.LastIndexOf('/') + 1);
-        //    // Track buildings with the same name without postfixes as toggleable
-        //    int index = prefabName.IndexOf(".");
-        //    if (index > 0)
-        //    {
-        //        string prefabId = prefabName.Substring(0, index);
-        //        if (prefabIdToName.TryGetValue(prefabId, out string otherPrefabName))
-        //        {
-        //            ToggleableBuildings.Add(prefabName);
-        //            ToggleableBuildings.Add(otherPrefabName);
-        //            Debug.Log(prefabName + " " + otherPrefabName);
-        //        }
-        //        else
-        //        {
-        //            prefabIdToName[prefabId] = prefabName;
-        //        }
-        //    }
-        //}
 
         /**
          * Add faction letters to buttons
@@ -152,6 +124,8 @@ namespace UnifiedFactions {
                 // Mark unique faction buildings
                 if (!BuildingVariants.HasVariant(buildingName) && text != "") {
                     text += "*";
+                } else {
+                    text += "~";
                 }
 
                 Label label = new() {
@@ -180,7 +154,7 @@ namespace UnifiedFactions {
             if (toolGroupEnteredEvent.ToolGroup == ____toolGroup)
             {
                 ToolButtonModifier.CurrentToolGroupButton = __instance;
-                //ToolButtonModifier.RefreshSection(null);
+                ToolButtonModifier.RefreshSection(null);
             }
         }
 
