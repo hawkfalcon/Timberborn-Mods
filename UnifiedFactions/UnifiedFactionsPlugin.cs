@@ -21,6 +21,8 @@ using UnifiedFactions;
 using Timberborn.ToolPanelSystem;
 using System.Collections.Immutable;
 using System.IO;
+using Timberborn.Buildings;
+using Timberborn.NeedSpecifications;
 
 namespace UnifiedFactions {
 
@@ -64,12 +66,25 @@ namespace UnifiedFactions {
                 return false;
             }
             List<GameObject> buildings = new();
-            //List<string> prefabPaths = new();
-            //List<string> preventDuplicatePrefabNames = new();
+
+            // Get an ordered list of factions, starting with Current
+            List<FactionSpecification> factionSpecifications = new();
+            factionSpecifications.Add(____factionService.Current);
             foreach (FactionSpecification factionSpecification in ____factionService._factionSpecificationService._factions)
             {
+                if (factionSpecification.Id != ____factionService.Current.Id)
+                {
+                    factionSpecifications.Add(factionSpecification);
+                }
+            }
+            Dictionary<string, Prefab> backwardCompatableCurrent = new();
+            foreach (FactionSpecification factionSpecification in factionSpecifications)
+            {
+                Debug.Log("Unified Factions - Adding Faction: " + factionSpecification.DisplayName);
                 foreach (string prefabPath in factionSpecification.CommonBuildings.Concat(factionSpecification.UniqueBuildings))
                 {
+                    // Just don't show them :|
+                    if (prefabPath.StartsWith("Buildings/Power/Dev")) continue;
                     GameObject gameObject = ____resourceAssetLoader.Load<GameObject>(prefabPath);
                     if (gameObject == null)
                     {
@@ -82,19 +97,33 @@ namespace UnifiedFactions {
                         Debug.Log("Prefab " + prefabPath + " is empty, skipping!");
                         continue;
                     }
+                    string buildingName = prefab.PrefabName;
                     // For any faction other than current, we have to clear out the old prefab name to prevent duplicates
-                    if (____factionService.Current != factionSpecification)
+                    if (____factionService.Current.Id == factionSpecification.Id)
                     {
+                        // track all current backward compatable prefabs
+                        foreach (string backwardCompatableName in prefab._backwardCompatiblePrefabNames)
+                        {
+                            backwardCompatableCurrent[backwardCompatableName] = prefab;
+                        }
+                    }
+                    else {
+                        // clear out all non-current backward compatable prefab
                         prefab._backwardCompatiblePrefabNames = new string[0];
+                        // clear out all current backward compatable prefab if we have to
+                        if (backwardCompatableCurrent.TryGetValue(buildingName, out Prefab originalPrefab))
+                        {
+                            originalPrefab._backwardCompatiblePrefabNames = new string[0];
+                        }
                     }
 
                     // Prevent duplicate prefab names, as we can't load them
-                    string buildingName = prefab.PrefabName;
-                    if (!BuildingVariants.TryAdd(buildingName)) {
+                    if (!BuildingVariants.TryAdd(buildingName))
+                    {
                         Debug.Log(prefabPath + " contains duplicate prefab name, skipping: " + buildingName);
                         continue;
                     }
-                    buildings.Add(gameObject);
+                    buildings.Add(gameObject);    
                 }
             }
             __result = buildings;
@@ -124,9 +153,7 @@ namespace UnifiedFactions {
                 // Mark unique faction buildings
                 if (!BuildingVariants.HasVariant(buildingName) && text != "") {
                     text += "*";
-                } else {
-                    text += "~";
-                }
+                } 
 
                 Label label = new() {
                     text = text,
@@ -185,6 +212,17 @@ namespace UnifiedFactions {
                 IToolFragment toolFragment = dictionary[item];
                 root.Add(toolFragment.InitializeFragment());
             }
+            return false;
+        }
+
+        /**
+         * What is a Faction Need?
+         */
+        [HarmonyPrefix]
+        [HarmonyPatch(typeof(NeedSpecification), "AvailableForAllFactions", MethodType.Getter)]
+        static bool AllFactionsAllNeeds(ref bool __result)
+        {
+            __result = true;
             return false;
         }
 
