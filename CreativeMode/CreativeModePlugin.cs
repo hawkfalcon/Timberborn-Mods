@@ -1,41 +1,28 @@
-﻿using BepInEx;
-using BepInEx.Configuration;
-using HarmonyLib;
+﻿using HarmonyLib;
 using Timberborn.ScienceSystem;
 using Timberborn.BlockObjectTools;
 using Timberborn.ToolSystem;
 using Timberborn.Options;
 using UnityEngine.UIElements;
-using TimberbornAPI;
+using TimberApi.ModSystem;
+using TimberApi.ConsoleSystem;
+using Timberborn.BuildingTools;
+using Timberborn.BlockSystem;
+using Timberborn.Buildings;
 
 namespace CreativeMode {
 
-    [BepInPlugin("com.hawkfalcon.plugin.creativemode", "Creative Mode", "1.5.0")]
     [HarmonyPatch]
-    public class CreativeModePlugin : BaseUnityPlugin {
+    public class CreativeModePlugin : IModEntrypoint {
 
         public static bool Enabled = true;
 
-        public static ConfigEntry<bool> EnableInstantBuilding;
-        private static ConfigEntry<bool> disableScienceCost;
-        private static ConfigEntry<bool> enableMapEditorTools;
+        private static CreativeModeConfig config;
 
-        public void OnEnable() {
-            EnableInstantBuilding = Config.Bind("General.Features",
-               "EnableInstantBuilding", true, "Anything that is placed is instantly built at no cost");
-            disableScienceCost = Config.Bind("General.Features",
-               "DisableScienceCost", true, "Placing anything no longer requires science");
-            enableMapEditorTools = Config.Bind("General.Features",
-                "EnableMapEditorTools", true, "Unlocks many map editor tools while playing");
-
-            TimberAPI.Localization.AddLabel("CreativeMode.ToolGroups.MapEditor", "Map editor tools");
-            if (enableMapEditorTools.Value) {
-                TimberAPI.DependencyRegistry.AddConfigurator(new CreativeModeConfigurator());
-                TimberAPI.DependencyRegistry.AddConfigurator(new MapEditorButtonsConfigurator());
-            }
+        public void Entry(IMod mod, IConsoleWriter consoleWriter)
+        {
+            config = mod.Configs.Get<CreativeModeConfig>();
             new Harmony("com.hawkfalcon.plugin.creativemode").PatchAll();
-
-            Logger.LogInfo("Plugin Creative Mode is loaded!");
         }
 
         /*
@@ -44,11 +31,26 @@ namespace CreativeMode {
         [HarmonyPrefix]
         [HarmonyPatch(typeof(BuildingUnlockingService), "Unlocked")]
         static bool BuildingUnlocker(ref bool __result) {
-            if (!(Enabled && disableScienceCost.Value)) {
+            if (!(Enabled && config.DisableScienceCost)) {
                 return true;
             }
             __result = true;
             return false;
+        }
+
+        /*
+          * Enables instant building
+          */
+        [HarmonyPrefix]
+        [HarmonyPatch(typeof(BuildingPlacer), "Place")]
+        static bool PlaceInstantly(BlockObject prefab)
+        {
+            if (Enabled && config.EnableInstantBuilding)
+            {
+                Building component = prefab.GetComponent<Building>();
+                component._placeFinished = true;
+            }
+            return true;
         }
 
         /**

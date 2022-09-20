@@ -2,11 +2,15 @@
 using Timberborn.BottomBarSystem;
 using Timberborn.ToolPanelSystem;
 using Bindito.Core;
+using TimberApi.ConfiguratorSystem;
+using TimberApi.SceneSystem;
 
-namespace CreativeMode {
+namespace CreativeMode
+{
     /**
     * Modified from MapEditorConfigurator
     */
+    [Configurator(SceneEntrypoint.InGame)]
     public class MapEditorButtonsConfigurator : IConfigurator {
 
         private class ToolPanelModuleProvider : IProvider<ToolPanelModule> {
