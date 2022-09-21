@@ -1,9 +1,11 @@
-﻿using System;
-using Bindito.Core;
+﻿using Bindito.Core;
+using TimberApi.ConfiguratorSystem;
+using TimberApi.SceneSystem;
 using Timberborn.ToolPanelSystem;
 
 namespace UnifiedFactions
 {
+    [Configurator(SceneEntrypoint.InGame)]
     public class UnifiedFactionsConfigurator : IConfigurator
     {
 		

@@ -1,6 +1,4 @@
-﻿using BepInEx;
-using BepInEx.Configuration;
-using HarmonyLib;
+﻿using HarmonyLib;
 using Timberborn.FactionSystemGame;
 using Timberborn.FactionSystem;
 using Timberborn.AssetSystem;
@@ -10,44 +8,34 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UIElements;
-using Timberborn.CoreUI;
 using Timberborn.PrefabOptimization;
 using Timberborn.PlantingUI;
 using Timberborn.Planting;
 using Timberborn.EntitySystem;
 using Timberborn.Localization;
-using TimberbornAPI;
-using UnifiedFactions;
 using Timberborn.ToolPanelSystem;
 using System.Collections.Immutable;
-using System.IO;
-using Timberborn.Buildings;
 using Timberborn.NeedSpecifications;
+using TimberApi.ModSystem;
+using TimberApi.ConsoleSystem;
 
 namespace UnifiedFactions {
 
-    [BepInPlugin("com.hawkfalcon.plugin.unifiedfactions", "Unified Factions", "1.2.0")]
     [HarmonyPatch]
-    public class UnifiedFactionsPlugin : BaseUnityPlugin {
+    public class UnifiedFactionsPlugin : IModEntrypoint
+    {
 
         public static readonly BuildingVariantTracker BuildingVariants = new();
 
         private static IEnumerable<Object> factionObjectCache = null;
 
-        private static ConfigEntry<bool> enableAllFactionBuildings;
-        private static ConfigEntry<bool> enableFactionLetters;
+        private static UnifiedFactionsConfig config;
 
-        public void OnEnable() {
-            enableAllFactionBuildings = Config.Bind("General.Features",
-               "EnableAllFactionBuildings", true, "Unlocks access to ALL faction buildings");
-            enableFactionLetters = Config.Bind("General.Features",
-               "EnableFactionLetters", true, "Show which faction each building belongs to in buttons");
-           
-            var harmony = new Harmony("com.hawkfalcon.plugin.unifiedfactions");
-            harmony.PatchAll();
-
-            TimberAPI.DependencyRegistry.AddConfigurator(new UnifiedFactionsConfigurator());
-            Logger.LogInfo("Plugin Unified Factions is loaded!");
+        public void Entry(IMod mod, IConsoleWriter consoleWriter)
+        {
+            config = mod.Configs.Get<UnifiedFactionsConfig>();
+            
+            new Harmony("com.hawkfalcon.plugin.unifiedfactions").PatchAll();
         }
 
         /*
@@ -56,7 +44,7 @@ namespace UnifiedFactions {
         [HarmonyPrefix]
         [HarmonyPatch(typeof(FactionObjectCollection), "GetObjects")]
         static bool UnlockFactionUniques(FactionService ____factionService, IResourceAssetLoader ____resourceAssetLoader, ref IEnumerable<Object> __result) {
-            if (!enableAllFactionBuildings.Value) {
+            if (!config.EnableAllFactionBuildings) {
                 return true;
             }
 
@@ -68,8 +56,10 @@ namespace UnifiedFactions {
             List<GameObject> buildings = new();
 
             // Get an ordered list of factions, starting with Current
-            List<FactionSpecification> factionSpecifications = new();
-            factionSpecifications.Add(____factionService.Current);
+            List<FactionSpecification> factionSpecifications = new()
+            {
+                ____factionService.Current
+            };
             foreach (FactionSpecification factionSpecification in ____factionService._factionSpecificationService._factions)
             {
                 if (factionSpecification.Id != ____factionService.Current.Id)
@@ -137,7 +127,7 @@ namespace UnifiedFactions {
         [HarmonyPostfix]
         [HarmonyPatch(typeof(ToolButton), "PostLoad")]
         static void AddFactionName(ToolButton __instance) {
-            if (!enableFactionLetters.Value) {
+            if (!config.EnableFactionLetters) {
                 return;
             }
             if (__instance.Tool is BlockObjectTool blockObjectTool) {
@@ -256,7 +246,7 @@ namespace UnifiedFactions {
         [HarmonyPrefix]
         [HarmonyPatch(typeof(UniqueBuildingCollection), "IsUnique")]
         static bool UnlockAllUniques(ref bool __result) {
-            if (!enableAllFactionBuildings.Value) {
+            if (!config.EnableAllFactionBuildings) {
                 return true;
             }
             __result = false;

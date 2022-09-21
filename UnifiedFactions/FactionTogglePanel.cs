@@ -1,18 +1,17 @@
-﻿using System;
+﻿using Bindito.Core;
 using Timberborn.BlockObjectTools;
 using Timberborn.CoreUI;
 using Timberborn.SingletonSystem;
 using Timberborn.ToolPanelSystem;
 using Timberborn.ToolSystem;
-using TimberbornAPI.EventSystem;
 using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace UnifiedFactions
 {
-	internal class FactionTogglePanel : EventListener, IToolFragment
+	internal class FactionTogglePanel : IToolFragment, ILoadableSingleton
 	{
-		private static BlockObjectTool currentTool = null;
+        private static BlockObjectTool currentTool = null;
 		private VisualElement _root;
 
         public VisualElement InitializeFragment()
@@ -45,7 +44,21 @@ namespace UnifiedFactions
             }
         }
 
-		[OnEvent]
+		// EventListener to allow [OnEvent]
+        private EventBus _eventBus;
+
+        [Inject]
+        public void InjectDependencies(EventBus eventBus)
+        {
+            _eventBus = eventBus;
+        }
+
+        public void Load()
+        {
+            _eventBus.Register(this);
+        }
+
+        [OnEvent]
 		public void OnToolEntered(ToolEnteredEvent toolEnteredEvent)
 		{
 			bool shouldShow = false;
