@@ -4,6 +4,6 @@
     "website_url": "https://github.com/hawkfalcon/Timberborn-Mods",
     "description": "Play with any faction building",
     "dependencies": [
-        "Timberborn_Central-TimberAPI-0.5.0"
+        "Timberborn_Central-TimberAPI-0.5.1"
     ]
 }
