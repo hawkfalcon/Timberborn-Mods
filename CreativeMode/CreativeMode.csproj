@@ -6,13 +6,14 @@
     <Description>Place anything, anytime</Description>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <LangVersion>9.0</LangVersion>
-    <ReleaseVersion>1.6.0</ReleaseVersion>
+    <ReleaseVersion>1.6.1</ReleaseVersion>
   </PropertyGroup>
 
   <ItemGroup Condition="'$(TargetFramework.TrimEnd(`0123456789`))' == 'net'">
     <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.2" PrivateAssets="all" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="TimberApi" Version="0.5.1" />
+    <PackageReference Include="TimberApi" Version="0.5.3" />
+    <PackageReference Include="System.Collections.Immutable" Version="6.0.0" />
   </ItemGroup>
 </Project>

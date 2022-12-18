@@ -57,7 +57,7 @@ namespace CreativeMode {
          * Unlock the Delete everything tool (from Map Editor)
          */
         [HarmonyPrefix]
-        [HarmonyPatch(typeof(AnyBlockObjectDeletionTool), "DevModeTool", MethodType.Getter)]
+        [HarmonyPatch(typeof(EntityBlockObjectDeletionTool), "DevModeTool", MethodType.Getter)]
         static bool ShowDeleteTool(ref bool __result) {
             __result = false;
             return false;

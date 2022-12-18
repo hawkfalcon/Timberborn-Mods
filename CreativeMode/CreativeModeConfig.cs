@@ -7,6 +7,6 @@ namespace CreativeMode
         public string ConfigFileName => "CreativeModeConfig";
 
         public bool EnableInstantBuilding = true;
-        public bool DisableScienceCost = false;
+        public bool DisableScienceCost = true;
     }
 }
