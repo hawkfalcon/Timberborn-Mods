@@ -18,6 +18,9 @@ using System.Collections.Immutable;
 using Timberborn.NeedSpecifications;
 using TimberApi.ModSystem;
 using TimberApi.ConsoleSystem;
+using Timberborn.PrefabSystem;
+using Timberborn.TutorialSystemInitialization;
+using Timberborn.TutorialSystem;
 
 namespace UnifiedFactions {
 
@@ -250,6 +253,13 @@ namespace UnifiedFactions {
                 return true;
             }
             __result = false;
+            return false;
+        }
+
+        [HarmonyPrefix]
+        [HarmonyPatch(typeof(TutorialConfigurationProvider), "CreateFolktailsConfiguration")]
+        static bool SkipTutorial(ref TutorialConfiguration __result) {
+            __result = new TutorialConfiguration.Builder("Skip").Build();
             return false;
         }
     }

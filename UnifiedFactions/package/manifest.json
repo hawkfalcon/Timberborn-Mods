@@ -1,9 +1,9 @@
 {
     "name": "UnifiedFactions",
-    "version_number": "1.3.0",
+    "version_number": "1.3.1",
     "website_url": "https://github.com/hawkfalcon/Timberborn-Mods",
     "description": "Play with any faction building",
     "dependencies": [
-        "Timberborn_Central-TimberAPI-0.5.1"
+        "Timberborn_Central-TimberAPI-0.5.3"
     ]
 }
