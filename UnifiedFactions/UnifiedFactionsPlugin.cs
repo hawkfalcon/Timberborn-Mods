@@ -74,7 +74,7 @@ namespace UnifiedFactions {
             foreach (FactionSpecification factionSpecification in factionSpecifications)
             {
                 Debug.Log("Unified Factions - Adding Faction: " + factionSpecification.DisplayName);
-                foreach (string prefabPath in factionSpecification.CommonBuildings.Concat(factionSpecification.UniqueBuildings))
+                foreach (string prefabPath in factionSpecification.CommonBuildings.Concat(factionSpecification.UniqueBuildings).Concat(factionSpecification.UniqueNaturalResources))
                 {
                     // Just don't show them :|
                     if (prefabPath.StartsWith("Buildings/Power/Dev")) continue;
