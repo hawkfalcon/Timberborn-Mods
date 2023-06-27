@@ -47,7 +47,7 @@ namespace CreativeMode {
         {
             if (Enabled && config.EnableInstantBuilding)
             {
-                Building component = prefab.GetComponent<Building>();
+                Building component = prefab.GetComponentFast<Building>();
                 component._placeFinished = true;
             }
             return true;
@@ -100,7 +100,7 @@ namespace CreativeMode {
 
         public static void ToggleCreativeMode(OptionsBox optionsBox) {
             Enabled = !Enabled;
-            optionsBox.ResumeClicked();
+            optionsBox.ResumeClicked(null);
         }
     }
 }
