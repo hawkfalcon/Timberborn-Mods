@@ -1,5 +1,4 @@
 ﻿using HarmonyLib;
-using Timberborn.FactionSystemGame;
 using Timberborn.FactionSystem;
 using Timberborn.AssetSystem;
 using Timberborn.BlockObjectTools;
@@ -11,7 +10,6 @@ using UnityEngine.UIElements;
 using Timberborn.PrefabOptimization;
 using Timberborn.PlantingUI;
 using Timberborn.Planting;
-using Timberborn.EntitySystem;
 using Timberborn.Localization;
 using Timberborn.ToolPanelSystem;
 using System.Collections.Immutable;
@@ -21,6 +19,7 @@ using TimberApi.ConsoleSystem;
 using Timberborn.PrefabSystem;
 using Timberborn.TutorialSystemInitialization;
 using Timberborn.TutorialSystem;
+using Timberborn.GameFactionSystem;
 
 namespace UnifiedFactions {
 
@@ -63,7 +62,7 @@ namespace UnifiedFactions {
             {
                 ____factionService.Current
             };
-            foreach (FactionSpecification factionSpecification in ____factionService._factionSpecificationService._factions)
+            foreach (FactionSpecification factionSpecification in ____factionService._factionSpecificationService.Factions)
             {
                 if (factionSpecification.Id != ____factionService.Current.Id)
                 {
@@ -238,7 +237,7 @@ namespace UnifiedFactions {
         [HarmonyPatch(typeof(PlantingToolButtonFactory), "GetPlanterBuildingName")]
         static bool FarmFix(ref string __result, Plantable plantable, ObjectCollectionService ____objectCollectionService, ILoc ____loc) {
             string displayNameLocKey = ____objectCollectionService.GetAllMonoBehaviours<PlanterBuilding>().First((PlanterBuilding building) =>
-                building.PlantableResourceGroup.Contains(plantable.ResourceGroup)).GetComponent<LabeledPrefab>().DisplayNameLocKey;
+                building.PlantableResourceGroup.Contains(plantable.ResourceGroup)).GetComponentFast<LabeledPrefab>().DisplayNameLocKey;
             __result = ____loc.T(displayNameLocKey);
             return false;
         }
