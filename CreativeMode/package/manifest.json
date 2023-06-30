@@ -1,9 +1,9 @@
 {
     "name": "CreativeMode",
-    "version_number": "1.6.1",
+    "version_number": "1.7.0",
     "website_url": "https://github.com/hawkfalcon/Timberborn-Mods",
     "description": "This mod lets you place or remove anything, anytime",
     "dependencies": [
-        "Timberborn_Central-TimberAPI-0.5.3"
+        "Timberborn_Central-TimberAPI-0.5.5"
     ]
 }

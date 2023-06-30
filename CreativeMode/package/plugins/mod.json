@@ -1,8 +1,8 @@
 ﻿{
   "Name": "CreativeMode",
-  "Version": "1.6.1",
+  "Version": "1.7",
   "UniqueId": "CreativeMode",
-  "MinimumApiVersion": "0.5.3",
-  "MinimumGameVersion": "0.3.4",
+  "MinimumApiVersion": "0.5.5",
+  "MinimumGameVersion": "0.4.0",
   "EntryDll": "Creative Mode.dll"
 }
