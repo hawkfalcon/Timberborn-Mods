@@ -1,0 +1,24 @@
+﻿ID,Text,Comment
+CreativeMode.Enabled, enabled
+CreativeMode.Disabled, disabled
+
+CreativeMode.ToolGroups, Creative Mode
+
+CreativeMode.ToggleMode, Creative Mode: ,
+CreativeMode.ToggleMode.Msg, Creative Mode was ,
+
+CreativeMode.ScienceCost, Science Cost: ,
+CreativeMode.ScienceCost.Msg, Science Cost was ,
+
+CreativeMode.InstantBuild, Instant Build: ,
+CreativeMode.InstantBuild.Msg, Instant Build was ,
+
+CreativeMode.Height, Height: ,
+
+CreativeMode.BeaverSpawnerTool.Title, Beaver Spawner
+CreativeMode.BeaverSpawnerTool.Description, Spawns a Beaver
+CreativeMode.BeaverSpawnerTool.Usage, Hold down <b>Shift</b> to spawn 10 Beavers<br>Hold down <b>Ctrl</b> to spawn a baby
+
+CreativeMode.BotSpawnerTool.Title, Bot Spawner
+CreativeMode.BotSpawnerTool.Description, Spawns a Robot
+CreativeMode.BotSpawnerTool.Usage, Hold down <b>Shift</b> to spawn 10 robots

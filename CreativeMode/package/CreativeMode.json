@@ -1,0 +1,7 @@
+{
+  "Enabled": false,
+  "InstantBuild": false,
+  "ScienceCost": true,
+  "ResumeButtonClick": "Creative",
+  "TimeFormat": "dd.MM.yyyy hh:mm ss"
+}
