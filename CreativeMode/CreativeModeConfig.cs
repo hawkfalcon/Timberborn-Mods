@@ -1,12 +1,17 @@
-﻿using TimberApi.ConfigSystem;
+﻿using System.Reflection;
+using TimberApi.ConfigSystem;
 
 namespace CreativeMode
 {
     public class CreativeModeConfig : IConfig
     {
-        public string ConfigFileName => "CreativeModeConfig";
+        public bool Enabled = false;
+        public bool InstantBuild = false;
+        public bool ScienceCost = true;
+        public string TimeFormat = "MM/dd/yyyy hh:mm ss";
+        
+        public ResumeButtons ResumeButtonClick = ResumeButtons.None;
 
-        public bool EnableInstantBuilding = true;
-        public bool DisableScienceCost = true;
+        public string ConfigFileName => Assembly.GetExecutingAssembly().GetName().Name;
     }
 }
