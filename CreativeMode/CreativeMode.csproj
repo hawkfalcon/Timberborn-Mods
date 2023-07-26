@@ -1,19 +1,30 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
-    <AssemblyName>Creative Mode</AssemblyName>
+    <AssemblyName>CreativeMode</AssemblyName>
     <Description>Place anything, anytime</Description>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <LangVersion>9.0</LangVersion>
+    <LangVersion>8</LangVersion>
     <ReleaseVersion>1.7</ReleaseVersion>
+    <NoWarn>NU1701</NoWarn>
+    <Nullable>disable</Nullable>
   </PropertyGroup>
 
+  <Target Name="CopyDLLs" AfterTargets="Build">
+    <Message Text="Executing CopyDLLs task" Importance="high" />
+    <Copy SourceFiles="$(TargetDir)$(AssemblyName).dll" DestinationFolder="E:\Games\Steam\steamapps\common\Timberborn\BepInEx\plugins\$(AssemblyName)" SkipUnchangedFiles="true" ContinueOnError="true" />
+    <Copy SourceFiles="$(ProjectDir)package/mod.json" DestinationFolder="E:\Games\Steam\steamapps\common\Timberborn\BepInEx\plugins\$(AssemblyName)" SkipUnchangedFiles="true" ContinueOnError="true" />
+    <Copy SourceFiles="$(ProjectDir)package/$(AssemblyName).json" DestinationFolder="E:\Games\Steam\steamapps\common\Timberborn\BepInEx\plugins\$(AssemblyName)\configs" SkipUnchangedFiles="true" ContinueOnError="true" />
+    <Copy SourceFiles="$(ProjectDir)package/lang/enUS.txt" DestinationFolder="E:\Games\Steam\steamapps\common\Timberborn\BepInEx\plugins\$(AssemblyName)\lang" SkipUnchangedFiles="true" ContinueOnError="true" />
+    <Message Text="Copied build files" Importance="high" />
+  </Target>
+  
   <ItemGroup Condition="'$(TargetFramework.TrimEnd(`0123456789`))' == 'net'">
     <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.2" PrivateAssets="all" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="TimberApi" Version="0.5.5.3" />
+    <PackageReference Include="TimberApi" Version="0.5.5.8" />
     <PackageReference Include="System.Collections.Immutable" Version="6.0.0" />
   </ItemGroup>
 </Project>
